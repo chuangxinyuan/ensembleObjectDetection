@@ -106,7 +106,7 @@ def mainDataset(dataset,output, confidence,weights,fichClass):
             tf.import_graph_def(od_graph_def, name='')
             config = tf.compat.v1.ConfigProto()
             config.gpu_options.allow_growth=True
-            sess = tf.Session(graph=detection_graph, config=config)
+            sess = tf.compat.v1.Session(graph=detection_graph, config=config)
 
     imagePaths = list(paths.list_images(dataset))
     for (i, imagePath) in enumerate(imagePaths):
