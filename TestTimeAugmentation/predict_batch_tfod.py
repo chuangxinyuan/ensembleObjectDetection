@@ -129,20 +129,20 @@ def mainDataset(dataset,output, confidence,weights,fichClass):
         num_detections = detection_graph.get_tensor_by_name('num_detections:0')
         (boxes, scores, classes, num_detections) = sess.run([boxes, scores, classes, num_detections], feed_dict={image_tensor: image_np_expanded})
 
-    result = []
-    for i in range(len(classes[0])):
-        if scores[0][i] >= 0.5:
-            xmin, ymin, xmax, ymax = _normalize_box(boxes[0][i], width, height)
-            label = CLASSES[classes[0][i]]
-            result.append(([label, [xmin, ymin, xmax, ymax]], scores[0][i]))
+        result = []
+        for i in range(len(classes[0])):
+            if scores[0][i] >= 0.5:
+                xmin, ymin, xmax, ymax = _normalize_box(boxes[0][i], width, height)
+                label = CLASSES[classes[0][i]]
+                result.append(([label, [xmin, ymin, xmax, ymax]], scores[0][i]))
 
-    # parse the filename from the input image path, construct the
-    # path to the output image, and write the image to disk
-    filename = imagePath.split(os.path.sep)[-1]
-    #outputPath = os.path.sep.join([args["output"], filename])
-    file = open(imagePath[0:imagePath.rfind(".")]+".xml", "w")
-    file.write(generateXML(imagePath[0:imagePath.rfind(".")],imagePath,weights, height, 3, result))
-    file.close()
+        # parse the filename from the input image path, construct the
+        # path to the output image, and write the image to disk
+        filename = imagePath.split(os.path.sep)[-1]
+        #outputPath = os.path.sep.join([args["output"], filename])
+        file = open(imagePath[0:imagePath.rfind(".")]+".xml", "w")
+        file.write(generateXML(imagePath[0:imagePath.rfind(".")],imagePath,weights, height, 3, result))
+        file.close()
 
 	
 	#cv2.imwrite(outputPath, output)
