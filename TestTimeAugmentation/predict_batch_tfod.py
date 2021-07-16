@@ -104,7 +104,7 @@ def mainDataset(dataset,output, confidence,weights,fichClass):
             serialized_graph = fid.read()
             od_graph_def.ParseFromString(serialized_graph)
             tf.import_graph_def(od_graph_def, name='')
-            config = tf.ConfigProto()
+            config = tf.compat.v1.ConfigProto()
             config.gpu_options.allow_growth=True
             sess = tf.Session(graph=detection_graph, config=config)
 
