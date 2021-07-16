@@ -32,7 +32,7 @@ def main(args):
         fasterResnet = testTimeAugmentation.MXnetFasterRCNNPred('/mnt/src/faster_rcnn_resnet50_v1b_voc-447328d8.params', '/mnt/src/classesMXnet.txt')
         listModels.append(fasterResnet)
     if 'tfod' in models_list:
-        tfodModel = testTimeAugmentation.TFODPred('frozen_inference_graph.pb', 'classes.csv')
+        tfodModel = testTimeAugmentation.TFODPred('/mnt/output/frozen_inference_graph.pb', 'classes.csv')
         listModels.append(tfodModel)
         
 #     listaModels = [retinaResnet50, maskRcnn]
