@@ -11,6 +11,7 @@ import argparse
 import cv2
 import os
 from PIL import Image
+import tensorflow as tf
 
 
 def prettify(elem):
