@@ -20,6 +20,7 @@ def prettify(elem):
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
+
 def _normalize_box(box, w, h):
     xmin = int(box[1] * w)
     ymin = int(box[0] * h)
@@ -28,7 +29,7 @@ def _normalize_box(box, w, h):
     return xmin, ymin, xmax, ymax
 
 
-def generateXML(filename,outputPath,w,h,d,boxes):
+def generateXML(filename, outputPath, w, h, d, boxes):
     top = ET.Element('annotation')
     childFolder = ET.SubElement(top, 'folder')
     childFolder.text = 'images'
@@ -48,15 +49,15 @@ def generateXML(filename,outputPath,w,h,d,boxes):
     childDepth.text = str(d)
     childSegmented = ET.SubElement(top, 'segmented')
     childSegmented.text = str(0)
-    #boxes tiene que contener labels
-    for (box,score) in boxes:
+    # boxes tiene que contener labels
+    for (box, score) in boxes:
         # Cambiar categoria por label
         category = box[0]
         box = box[1].astype("int")
         ####### 
         # Cuidado esto está cambiado con respecto a lo que es habitualmente
         #######  
-        (x,y,xmax,ymax) = box
+        (x, y, xmax, ymax) = box
         childObject = ET.SubElement(top, 'object')
         childName = ET.SubElement(childObject, 'name')
         childName.text = category
@@ -79,13 +80,16 @@ def generateXML(filename,outputPath,w,h,d,boxes):
         childYmax.text = str(ymax)
     return prettify(top)
 
+
 def load_image_into_numpy(image):
     (im_width, im_height) = image.size
-    return np.array(image.getdata()).reshape((im_height, im_width, 3)).astype(np.uint8)
+    return np.array(image.getdata()).reshape((im_height, im_width, 3)).astype(
+        np.uint8)
+
 
 # loop over the input image paths
 
-def mainDataset(dataset,output, confidence,weights,fichClass):
+def mainDataset(dataset, output, confidence, weights, fichClass):
     CLASSES = {}
     with open(fichClass, "r") as f:
         f.readline()  # First line is header
@@ -95,53 +99,56 @@ def mainDataset(dataset,output, confidence,weights,fichClass):
             CLASSES[cnt] = line
             line = f.readline().rstrip()
             cnt += 1
-    
+
     detection_graph = tf.Graph()
     with detection_graph.as_default():
         od_graph_def = tf.GraphDef()
-        with tf.gfile.GFile(weights , 'rb') as fid:
+        with tf.gfile.GFile(weights, 'rb') as fid:
             serialized_graph = fid.read()
             od_graph_def.ParseFromString(serialized_graph)
             tf.import_graph_def(od_graph_def, name='')
             config = tf.ConfigProto()
-            config.gpu_options.allow_growth=True
+            config.gpu_options.allow_growth = True
             sess = tf.Session(graph=detection_graph, config=config)
 
     imagePaths = list(paths.list_images(dataset))
     for (i, imagePath) in enumerate(imagePaths):
-	# load the input image (in BGR order), clone it, and preprocess it
-	#print("[INFO] predicting on image {} of {}".format(i + 1,
-	#	len(imagePaths)))
+        # load the input image (in BGR order), clone it, and preprocess it
+        # print("[INFO] predicting on image {} of {}".format(i + 1,
+        #	len(imagePaths)))
 
-	# load the input image (in BGR order), clone it, and preprocess it
-	image = Image.open(imagePath)
-        width, height = image.size
-        if width > 1920 or height > 1080:
-            image = image.resize((width // 2, height // 2), Image.ANTIALIAS)
-        image_np = load_image_into_numpy(image)
-        image_np_expanded = np.expand_dims(image_np, axis=0)
+        # load the input image (in BGR order), clone it, and preprocess it
+        image = Image.open(imagePath)
+    width, height = image.size
+    if width > 1920 or height > 1080:
+        image = image.resize((width // 2, height // 2), Image.ANTIALIAS)
+    image_np = load_image_into_numpy(image)
+    image_np_expanded = np.expand_dims(image_np, axis=0)
 
-        image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
-        boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
-        scores = detection_graph.get_tensor_by_name('detection_scores:0')
-        classes = detection_graph.get_tensor_by_name('detection_classes:0')
-        num_detections = detection_graph.get_tensor_by_name('num_detections:0')
-        (boxes, scores, classes, num_detections) = sess.run([boxes, scores, classes, num_detections], feed_dict={image_tensor: image_np_expanded})
+    image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+    boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+    scores = detection_graph.get_tensor_by_name('detection_scores:0')
+    classes = detection_graph.get_tensor_by_name('detection_classes:0')
+    num_detections = detection_graph.get_tensor_by_name('num_detections:0')
+    (boxes, scores, classes, num_detections) = sess.run(
+        [boxes, scores, classes, num_detections],
+        feed_dict={image_tensor: image_np_expanded})
 
-        result = []
-        for i in range(len(classes[0])):
-            if scores[0][i] >= 0.5:
-                xmin, ymin, xmax, ymax = _normalize_box(boxes[0][i], width, height)
-                label = CLASSES[classes[0][i]]
-                result.append(([label, [xmin, ymin, xmax, ymax]], scores[0][i]))
+    result = []
+    for i in range(len(classes[0])):
+        if scores[0][i] >= 0.5:
+            xmin, ymin, xmax, ymax = _normalize_box(boxes[0][i], width, height)
+            label = CLASSES[classes[0][i]]
+            result.append(([label, [xmin, ymin, xmax, ymax]], scores[0][i]))
 
-	    # parse the filename from the input image path, construct the
-	    # path to the output image, and write the image to disk
-	    filename = imagePath.split(os.path.sep)[-1]
-	    #outputPath = os.path.sep.join([args["output"], filename])
-	    file = open(imagePath[0:imagePath.rfind(".")]+".xml", "w")
-	    file.write(generateXML(imagePath[0:imagePath.rfind(".")],imagePath,weight, height, 3, result))
-	    file.close()
+        # parse the filename from the input image path, construct the
+        # path to the output image, and write the image to disk
+        filename = imagePath.split(os.path.sep)[-1]
+        # outputPath = os.path.sep.join([args["output"], filename])
+        file = open(imagePath[0:imagePath.rfind(".")] + ".xml", "w")
+        file.write(
+            generateXML(imagePath[0:imagePath.rfind(".")], imagePath, weight,
+                        height, 3, result))
+        file.close()
 
-	
-	#cv2.imwrite(outputPath, output)
+# cv2.imwrite(outputPath, output)
