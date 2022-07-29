@@ -80,8 +80,8 @@ def generateXML(filename,outputPath,w,h,d,boxes):
     return prettify(top)
 
 def load_image_into_numpy(image):
-	(im_width, im_height) = image.size
-	return np.array(image.getdata()).reshape((im_height, im_width, 3)).astype(np.uint8)
+    (im_width, im_height) = image.size
+    return np.array(image.getdata()).reshape((im_height, im_width, 3)).astype(np.uint8)
 
 # loop over the input image paths
 
@@ -109,12 +109,12 @@ def mainDataset(dataset,output, confidence,weights,fichClass):
 
     imagePaths = list(paths.list_images(dataset))
     for (i, imagePath) in enumerate(imagePaths):
-	    # load the input image (in BGR order), clone it, and preprocess it
-	    #print("[INFO] predicting on image {} of {}".format(i + 1,
-	    #	len(imagePaths)))
+	# load the input image (in BGR order), clone it, and preprocess it
+	#print("[INFO] predicting on image {} of {}".format(i + 1,
+	#	len(imagePaths)))
 
-	    # load the input image (in BGR order), clone it, and preprocess it
-	    image = Image.open(imagePath)
+	# load the input image (in BGR order), clone it, and preprocess it
+	image = Image.open(imagePath)
         width, height = image.size
         if width > 1920 or height > 1080:
             image = image.resize((width // 2, height // 2), Image.ANTIALIAS)
