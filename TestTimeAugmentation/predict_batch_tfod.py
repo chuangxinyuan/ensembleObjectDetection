@@ -103,14 +103,14 @@ def mainDataset(dataset, output, confidence, weights, fichClass):
 
     detection_graph = tf.Graph()
     with detection_graph.as_default():
-        od_graph_def = tf.GraphDef()
-        with tf.gfile.GFile(weights, 'rb') as fid:
+        od_graph_def = tf.compat.v1.GraphDef()
+        with tf.io.gfile.GFile(weights, 'rb') as fid:
             serialized_graph = fid.read()
             od_graph_def.ParseFromString(serialized_graph)
-            tf.import_graph_def(od_graph_def, name='')
-            config = tf.ConfigProto()
+            tf.graph_util.import_graph_def(od_graph_def, name='')
+            config = tf.compat.v1.ConfigProto()
             config.gpu_options.allow_growth = True
-            sess = tf.Session(graph=detection_graph, config=config)
+            sess = tf.compat.v1.Session(graph=detection_graph, config=config)
 
     imagePaths = list(paths.list_images(dataset))
     for (i, imagePath) in enumerate(imagePaths):
