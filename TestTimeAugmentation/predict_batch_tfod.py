@@ -142,15 +142,15 @@ def mainDataset(dataset, output, confidence, weights, fichClass):
             label = CLASSES[classes[0][i]]
             result.append(([label, [xmin, ymin, xmax, ymax]], scores[0][i]))
 
-        # parse the filename from the input image path, construct the
-        # path to the output image, and write the image to disk
-        filename = imagePath.split(os.path.sep)[-1]
-        print(filename,';',result)
-        # outputPath = os.path.sep.join([args["output"], filename])
-        file = open(imagePath[0:imagePath.rfind(".")] + ".xml", "w")
-        file.write(
-            generateXML(imagePath[0:imagePath.rfind(".")], imagePath, width,
-                        height, 3, result))
-        file.close()
+    # parse the filename from the input image path, construct the
+    # path to the output image, and write the image to disk
+    filename = imagePath.split(os.path.sep)[-1]
+    print(filename,';',result)
+    # outputPath = os.path.sep.join([args["output"], filename])
+    file = open(imagePath[0:imagePath.rfind(".")] + ".xml", "w")
+    file.write(
+        generateXML(imagePath[0:imagePath.rfind(".")], imagePath, width,
+                    height, 3, result))
+    file.close()
 
 # cv2.imwrite(outputPath, output)
