@@ -54,7 +54,7 @@ def generateXML(filename, outputPath, w, h, d, boxes):
     for (box, score) in boxes:
         # Cambiar categoria por label
         category = box[0]
-        box = box[1].astype("int")
+        box = np.array(box[1]).astype("int")
         ####### 
         # Cuidado esto está cambiado con respecto a lo que es habitualmente
         #######  
