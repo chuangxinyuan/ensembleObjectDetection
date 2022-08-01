@@ -148,7 +148,7 @@ def mainDataset(dataset, output, confidence, weights, fichClass):
         # outputPath = os.path.sep.join([args["output"], filename])
         file = open(imagePath[0:imagePath.rfind(".")] + ".xml", "w")
         file.write(
-            generateXML(imagePath[0:imagePath.rfind(".")], imagePath, weights,
+            generateXML(imagePath[0:imagePath.rfind(".")], imagePath, width,
                         height, 3, result))
         file.close()
 
