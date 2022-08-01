@@ -120,36 +120,37 @@ def mainDataset(dataset, output, confidence, weights, fichClass):
 
         # load the input image (in BGR order), clone it, and preprocess it
         image = Image.open(imagePath)
-    width, height = image.size
-    if width > 1920 or height > 1080:
-        image = image.resize((width // 2, height // 2), Image.ANTIALIAS)
-    image_np = load_image_into_numpy(image)
-    image_np_expanded = np.expand_dims(image_np, axis=0)
+        width, height = image.size
+        if width > 1920 or height > 1080:
+            image = image.resize((width // 2, height // 2), Image.ANTIALIAS)
+        image_np = load_image_into_numpy(image)
+        image_np_expanded = np.expand_dims(image_np, axis=0)
 
-    image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
-    boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
-    scores = detection_graph.get_tensor_by_name('detection_scores:0')
-    classes = detection_graph.get_tensor_by_name('detection_classes:0')
-    num_detections = detection_graph.get_tensor_by_name('num_detections:0')
-    (boxes, scores, classes, num_detections) = sess.run(
-        [boxes, scores, classes, num_detections],
-        feed_dict={image_tensor: image_np_expanded})
+        image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+        boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+        scores = detection_graph.get_tensor_by_name('detection_scores:0')
+        classes = detection_graph.get_tensor_by_name('detection_classes:0')
+        num_detections = detection_graph.get_tensor_by_name('num_detections:0')
+        (boxes, scores, classes, num_detections) = sess.run(
+            [boxes, scores, classes, num_detections],
+            feed_dict={image_tensor: image_np_expanded})
 
-    result = []
-    for i in range(len(classes[0])):
-        if scores[0][i] >= 0.5:
-            xmin, ymin, xmax, ymax = _normalize_box(boxes[0][i], width, height)
-            label = CLASSES[classes[0][i]]
-            result.append(([label, [xmin, ymin, xmax, ymax]], scores[0][i]))
+        result = []
+        for i in range(len(classes[0])):
+            if scores[0][i] >= 0.5:
+                xmin, ymin, xmax, ymax = _normalize_box(boxes[0][i], width, height)
+                label = CLASSES[classes[0][i]]
+                result.append(([label, [xmin, ymin, xmax, ymax]], scores[0][i]))
 
-    # parse the filename from the input image path, construct the
-    # path to the output image, and write the image to disk
-    filename = imagePath.split(os.path.sep)[-1]
-    # outputPath = os.path.sep.join([args["output"], filename])
-    file = open(imagePath[0:imagePath.rfind(".")] + ".xml", "w")
-    file.write(
-        generateXML(imagePath[0:imagePath.rfind(".")], imagePath, width,
-                    height, 3, result))
-    file.close()
+        # parse the filename from the input image path, construct the
+        # path to the output image, and write the image to disk
+        filename = imagePath.split(os.path.sep)[-1]
+        print(filename,';',result)
+        # outputPath = os.path.sep.join([args["output"], filename])
+        file = open(imagePath[0:imagePath.rfind(".")] + ".xml", "w")
+        file.write(
+            generateXML(imagePath[0:imagePath.rfind(".")], imagePath, width,
+                        height, 3, result))
+        file.close()
 
 # cv2.imwrite(outputPath, output)
