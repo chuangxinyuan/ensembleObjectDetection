@@ -233,7 +233,7 @@ def generate_xml(pathImg):
         for obj in root.findall('object'):
             shapes.append({'type':'rectangle','label':obj.find('name').text,'occluded':0,'points':[float(list(obj.iter('xmin'))[0].text),float(list(obj.iter('ymin'))[0].text),float(list(obj.iter('xmax'))[0].text),float(list(obj.iter('ymax'))[0].text)]})
         final_result['frames'].append({'frame':int(image['id']), 'width':int(image['width']), 'height':int(image['height']), 'shapes':shapes})
-    dump_as_cvat_annotation(open(pathImg+"output/cvat_xml_output.xml", "w"), final_result)
+    dump_as_cvat_annotation(open(pathImg+"/output/cvat_xml_output.xml", "w"), final_result)
 
 
 if __name__ =="__main__":
