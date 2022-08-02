@@ -227,7 +227,7 @@ def generate_xml(pathImg):
     len_images = len(_images)
     final_result = {'meta':{'task': OrderedDict([('id','0'),('name',"onepanel_workflow_default_name"),('size',str(len_images)),('mode','interpolation'),('start_frame', '0'),('stop_frame', str(len_images-1)),('z_order',"False"),('labels', labels)])}, 'frames':[]}
     for image in data['images']:
-        tree = ET.parse(os.path.join(pathImg+"output", os.path.basename(image['file_name']))[:-4]+'.xml')
+        tree = ET.parse(os.path.join(pathImg+"/output", os.path.basename(image['file_name']))[:-4]+'.xml')
         root = tree.getroot()
         shapes = []
         for obj in root.findall('object'):
