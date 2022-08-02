@@ -15,7 +15,7 @@ def visualize_images(pathImg):
     _images = glob.glob("/mnt/data/dataorig/images/*.jpg")
     _images.extend(glob.glob("/mnt/data/dataorig/images/*.png"))
     for image in data['images']:
-        tree = ET.parse(os.path.join(pathImg+"output", os.path.basename(image['file_name']))[:-4]+'.xml')
+        tree = ET.parse(os.path.join(pathImg+"/output", os.path.basename(image['file_name']))[:-4]+'.xml')
         root = tree.getroot()   
         boxes = []
         for obj in root.findall('object'):
