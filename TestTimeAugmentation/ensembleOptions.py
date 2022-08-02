@@ -34,7 +34,7 @@ def ensembleOptions(datasetPath, option):
         print('----------------------------------------------------------------------------')
         file = open(datasetPath+"/output/"+nombre+".xml", "w")
         numFich = len(fichIguales)
-        doc = etree.parse(fichIguales[0])
+        doc = etree.parse(fichIguales[-1])
         filename = doc.getroot()  # we look for the root of our xml
         wI = filename.find("size").find("width").text
         hI = filename.find("size").find("height").text
