@@ -10,31 +10,31 @@ def listarCuadrados(pathCarpeta):
     prob = 0.5
     listDirectorios = os.scandir(path=pathCarpeta)#we list the files in the last folder
     for files in listDirectorios:
-        if not files.is_dir():
+        if files.is_dir():
             break
 
-        for fichero in os.listdir(files):#We go through the files in the folder
-            (nombreFichero, extension) = os.path.splitext(fichero)
+    for fichero in os.listdir(files):#We go through the files in the folder
+        (nombreFichero, extension) = os.path.splitext(fichero)
 
-            if (extension == ".xml"):#we stay with those who are xmls and we go through them looking for a box
-                boxes=[]
-                fichIguales = glob.glob(pathCarpeta+'/*/'+fichero)#
-                for f in fichIguales:
-                    j = 0  # declaration of variables
+        if (extension == ".xml"):#we stay with those who are xmls and we go through them looking for a box
+            boxes=[]
+            fichIguales = glob.glob(pathCarpeta+'/*/'+fichero)#
+            for f in fichIguales:
+                j = 0  # declaration of variables
 
-                    doc = etree.parse(f)
-                    filename = doc.getroot()  # we look for the root of our xml
-                    objetos = filename.findall("object")
-                    while j < len(objetos):
-                        name = objetos[j].find("name").text
-                        ymax = float(objetos[j].find("bndbox").find("ymax").text)
-                        ymin = float(objetos[j].find("bndbox").find("ymin").text)
-                        xmax = float(objetos[j].find("bndbox").find("xmax").text)
-                        xmin = float(objetos[j].find("bndbox").find("xmin").text)
-                        prob = "{0:.2f}".format(float(objetos[j].find("confidence").text))
-                        boxes.append([name, xmin, ymin, xmax, ymax, prob])
-                        j = j+1
-            boxesAllXmls.append((nombreFichero,boxes))
+                doc = etree.parse(f)
+                filename = doc.getroot()  # we look for the root of our xml
+                objetos = filename.findall("object")
+                while j < len(objetos):
+                    name = objetos[j].find("name").text
+                    ymax = float(objetos[j].find("bndbox").find("ymax").text)
+                    ymin = float(objetos[j].find("bndbox").find("ymin").text)
+                    xmax = float(objetos[j].find("bndbox").find("xmax").text)
+                    xmin = float(objetos[j].find("bndbox").find("xmin").text)
+                    prob = "{0:.2f}".format(float(objetos[j].find("confidence").text))
+                    boxes.append([name, xmin, ymin, xmax, ymax, prob])
+                    j = j+1
+        boxesAllXmls.append((nombreFichero,boxes))
     return boxesAllXmls
 
 
