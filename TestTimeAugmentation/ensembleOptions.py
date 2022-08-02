@@ -64,5 +64,7 @@ def ensembleOptions(datasetPath, option):
     
             if len(pick)!=0:
                 resul.append(list(pick[0]))
+        print('resul: ', resul)
+        print('----------------------------------------------------------------------------')
         file.write(generateXML.generateXML(nombre, "", wI, hI, d, resul))
         file.close()
