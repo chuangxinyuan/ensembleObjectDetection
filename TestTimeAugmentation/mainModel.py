@@ -57,7 +57,7 @@ def models(listaModels,pathImg,option, combine=False):
         print('------------------------------------------------------')
 
         ensembleOptions.ensembleOptions(pathImg, option)
-        visualize_images(pathImg)
+#         visualize_images(pathImg)
         generate_xml(pathImg)
         os.makedirs("/mnt/output/output/")
         for sub_dir in os.listdir(pathImg+"output/"):
