@@ -53,6 +53,8 @@ def models(listaModels,pathImg,option, combine=False):
         for dirOut in os.listdir(pathImg):
             for file in list(paths.list_files(pathImg+dirOut, validExts=(".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif"))):
                 os.remove(file)
+        print('pathImg: ', pathImg)
+        print('------------------------------------------------------')
 
         ensembleOptions.ensembleOptions(pathImg, option)
         visualize_images(pathImg)
