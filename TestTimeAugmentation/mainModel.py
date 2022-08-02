@@ -60,8 +60,8 @@ def models(listaModels,pathImg,option, combine=False):
 #         visualize_images(pathImg)
 #         generate_xml(pathImg)
         os.makedirs("/mnt/output/output/")
-        for sub_dir in os.listdir(pathImg+"output/"):
-            dir_to_ = os.path.join(pathImg+"output", sub_dir)
+        for sub_dir in os.listdir(pathImg+"/output/"):
+            dir_to_ = os.path.join(pathImg+"/output", sub_dir)
             shutil.move(dir_to_, os.path.join("/mnt/output", 'output', sub_dir))
 
 
