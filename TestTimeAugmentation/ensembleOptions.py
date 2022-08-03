@@ -16,8 +16,6 @@ def ensembleOptions(datasetPath, option):
     #we get a list that contains as many pairs as there are xmls in the first folder, 
     #these pairs indicate first the name of the xml file and then contain a list with all the objects of the xmls
     boxes = ensemble.listarCuadrados(datasetPath)
-    print('boxes: ', boxes)
-    print('----------------------------------------------------------------------------')
 
     #we separate by images and we get a list that groups the objects by the iou> 0.5
     for nombre,lis in boxes:
@@ -30,8 +28,6 @@ def ensembleOptions(datasetPath, option):
         
         #we look for the width, height and depth of the image
         fichIguales = glob.glob(datasetPath + '/*/' + nombre+'.xml')
-        print('fichIguales: ', fichIguales)
-        print('----------------------------------------------------------------------------')
         file = open(datasetPath+"/output/"+nombre+".xml", "w")
         numFich = len(fichIguales)
         doc = etree.parse(fichIguales[-1])
@@ -64,9 +60,6 @@ def ensembleOptions(datasetPath, option):
     
             if len(pick)!=0:
                 resul.append(list(pick[0]))
-            print('pick: ', pick)
-            print('----------------------------------------------------------------------------')
-        print('resul: ', resul)
-        print('----------------------------------------------------------------------------')
+  
         file.write(generateXML.generateXML(nombre, "", wI, hI, d, resul))
         file.close()
