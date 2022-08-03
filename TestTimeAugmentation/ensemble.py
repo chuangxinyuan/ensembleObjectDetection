@@ -8,6 +8,7 @@ def listarCuadrados(pathCarpeta):
     boxesAllXmls = []#list that stores all the lists of boxes of all xml
     boxes = []  # list that will contain all the squares of each xml
     prob = 0.5
+    nombreFichero_boxes = {}
     listDirectorios = os.scandir(path=pathCarpeta)#we list the files in the last folder
     for files in listDirectorios:
         if files.is_dir():
@@ -35,7 +36,12 @@ def listarCuadrados(pathCarpeta):
                     prob = "{0:.2f}".format(float(objetos[j].find("confidence").text))
                     boxes.append([name, xmin, ymin, xmax, ymax, prob])
                     j = j+1
-        boxesAllXmls.append((nombreFichero,boxes))
+        if nombreFichero_boxes.get(nombreFichero) is None:
+            nombreFichero_boxes[nombreFichero] = boxes
+        else:
+            nombreFichero_boxes[nombreFichero].extend(boxes)
+    for k, v in nombreFichero_boxes.items():
+    boxesAllXmls.append((k,v))
     return boxesAllXmls
 
 def uneBoundingBoxes(boxesAllXmls):
