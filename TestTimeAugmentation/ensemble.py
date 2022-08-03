@@ -14,7 +14,6 @@ def listarCuadrados(pathCarpeta):
         if files.is_dir():
             break
 
-
     for fichero in os.listdir(files):#We go through the files in the folder
         (nombreFichero, extension) = os.path.splitext(fichero)
 
