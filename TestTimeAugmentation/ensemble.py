@@ -41,7 +41,7 @@ def listarCuadrados(pathCarpeta):
         else:
             nombreFichero_boxes[nombreFichero].extend(boxes)
     for k, v in nombreFichero_boxes.items():
-    boxesAllXmls.append((k,v))
+        boxesAllXmls.append((k,v))
     return boxesAllXmls
 
 def uneBoundingBoxes(boxesAllXmls):
