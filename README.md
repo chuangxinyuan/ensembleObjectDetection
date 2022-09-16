@@ -1,5 +1,9 @@
 # Ensemble methods for object detection
 
+在此代码仓库中，我们提供了用于集成多个目标检测模型输出的代码。在这篇示例中，我们将创建一个工作流，以在两个不同机器上执行的不同模型上运行推理，并组合来自多个目标检测模型的输出，工作流 YAML 文件定义见 workflow.yaml。
+
+![image](https://user-images.githubusercontent.com/51055204/190551954-513eb91c-5416-4143-a99a-1f25bdcd1b38.png)
+
 In this repository, we provide the code for ensembling the output of object detection models, and applying test-time augmentation for object detection. This library has been designed to be applicable to any object detection model independently of the underlying algorithm and the framework employed to implement it. A draft describing the techniques implemented in this repository are available in the following [article](https://drive.google.com/file/d/1ku8X8lHs6lethEa5Adhj7frzV44NTbl4/view?usp=sharing).
 
 0. [Installation](#installation-and-requirements)
