@@ -30,10 +30,9 @@ def models(listaModels,pathImg,option, combine=False):
         # 3. we copy the images from the initial folder to each of the created folders
         for dire in listDirOut:
             for fich in os.listdir(pathImg):
-                shutil.copy(pathImg+'/'+fich, dire+'/')
-                
                 print('\ncui************log fich: ')
                 print(fich)
+                shutil.copy(pathImg+'/'+fich, dire+'/')
 
 
         # 4. Generate xml
