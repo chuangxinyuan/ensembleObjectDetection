@@ -8,7 +8,7 @@ from imutils import paths
 from generate_xml_cvat import generate_xml
 import shutil
 from visualize import visualize_images
-
+import glob
 
 def models(listaModels,pathImg,option, combine=False):
     if combine=='False':
@@ -29,7 +29,7 @@ def models(listaModels,pathImg,option, combine=False):
 
         # 3. we copy the images from the initial folder to each of the created folders
         for dire in listDirOut:
-            for fich in os.listdir(pathImg):
+            for fich in glob.glob(pathImage+'*.jpg') + glob.glob(pathImage+'*.png') + glob.glob(pathImage+'*.jpeg'):
                 print('\ncui************log fich: ')
                 print(fich)
                 shutil.copy(pathImg+'/'+fich, dire+'/')
