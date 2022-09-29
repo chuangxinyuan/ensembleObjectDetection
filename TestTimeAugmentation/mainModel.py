@@ -29,10 +29,10 @@ def models(listaModels,pathImg,option, combine=False):
 
         # 3. we copy the images from the initial folder to each of the created folders
         for dire in listDirOut:
-            for fich in glob.glob(pathImg+'*.jpg') + glob.glob(pathImg+'*.png') + glob.glob(pathImg+'*.jpeg'):
+            for fich in glob.glob(pathImg+'/*.jpg') + glob.glob(pathImg+'/*.png') + glob.glob(pathImg+'/*.jpeg'):
                 print('\ncui************log fich: ')
                 print(fich)
-                shutil.copy(pathImg+'/'+fich, dire+'/')
+                shutil.copy(fich, dire+'/')
 
 
         # 4. Generate xml
@@ -53,9 +53,9 @@ def models(listaModels,pathImg,option, combine=False):
                 shutil.move(dir_to_move, os.path.join(dest, sub_dir, file))
 
     else:
-        # 5. We perform the ensemble method
-        pathImg = os.path.join(pathImg,"dog-cat-demo",'Test') 
+        # 5. We perform the ensemble method 
         for dirOut in os.listdir(pathImg):
+            for file in glob.glob(pathImg+'*.jpg') + glob.glob(pathImg+'*.png') + glob.glob(pathImg+'*.jpeg'
             for file in list(paths.list_files(pathImg+dirOut, validExts=(".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif"))):
                 os.remove(file)
         print('pathImg: ', pathImg)
