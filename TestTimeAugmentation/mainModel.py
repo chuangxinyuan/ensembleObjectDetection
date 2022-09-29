@@ -29,7 +29,7 @@ def models(listaModels,pathImg,option, combine=False):
 
         # 3. we copy the images from the initial folder to each of the created folders
         for dire in listDirOut:
-            for fich in glob.glob(pathImg+'/*.jpg') + glob.glob(pathImg+'/*.png') + glob.glob(pathImg+'/*.jpeg'):
+            for fich in glob.glob(pathImg+'*.jpg',recursive=True) + glob.glob(pathImg+'*.png',recursive=True) + glob.glob(pathImg+'*.jpeg',recursive=True):
                 print('\ncui************log fich: ')
                 print(fich)
                 shutil.copy(fich, dire+'/')
@@ -55,7 +55,6 @@ def models(listaModels,pathImg,option, combine=False):
     else:
         # 5. We perform the ensemble method 
         for dirOut in os.listdir(pathImg):
-            for file in glob.glob(pathImg+'*.jpg') + glob.glob(pathImg+'*.png') + glob.glob(pathImg+'*.jpeg'
             for file in list(paths.list_files(pathImg+dirOut, validExts=(".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif"))):
                 os.remove(file)
         print('pathImg: ', pathImg)
