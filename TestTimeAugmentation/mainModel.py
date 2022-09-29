@@ -29,7 +29,7 @@ def models(listaModels,pathImg,option, combine=False):
 
         # 3. we copy the images from the initial folder to each of the created folders
         for dire in listDirOut:
-            for fich in glob.glob(pathImage+'*.jpg') + glob.glob(pathImage+'*.png') + glob.glob(pathImage+'*.jpeg'):
+            for fich in glob.glob(pathImg+'*.jpg') + glob.glob(pathImg+'*.png') + glob.glob(pathImg+'*.jpeg'):
                 print('\ncui************log fich: ')
                 print(fich)
                 shutil.copy(pathImg+'/'+fich, dire+'/')
