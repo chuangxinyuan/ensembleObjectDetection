@@ -54,6 +54,7 @@ def models(listaModels,pathImg,option, combine=False):
 
     else:
         # 5. We perform the ensemble method
+        pathImg = os.path.join(pathImg,"dog-cat-demo",'Test') 
         for dirOut in os.listdir(pathImg):
             for file in list(paths.list_files(pathImg+dirOut, validExts=(".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif"))):
                 os.remove(file)
