@@ -58,7 +58,7 @@ templates:
         s3:
           key: '{{workflow.namespace}}/{{workflow.parameters.model-output-path}}/{{workflow.name}}'
     container:
-      image: tensorflow/tensorflow:latest
+      image: cxyacr.azurecr.cn/docker.io/tensorflow/tensorflow:2.10.0
       command: [sh, -c]
       args:
        - |
@@ -69,7 +69,7 @@ templates:
         && python TestTimeAugmentation/run.py --images_path=/mnt/data/datasets --models=tfod,ssd_resnet --option={{workflow.parameters.ensemble-option}} --combine=True \
       workingDir: /mnt/src
     nodeSelector:
-      node.kubernetes.io/instance-type: '{{workflow.parameters.sys-node-pool}}'    
+      beta.kubernetes.io/instance-type: '{{workflow.parameters.sys-node-pool}}'    
   - name: ssdresnet
     inputs:
       artifacts:
@@ -90,7 +90,7 @@ templates:
         s3:
           key: '{{workflow.namespace}}/{{workflow.parameters.model-output-path}}/{{workflow.name}}'
     container:
-      image: tensorflow/tensorflow:latest
+      image: cxyacr.azurecr.cn/docker.io/tensorflow/tensorflow:2.10.0
       command: [sh,-c]
       args:
       - |
@@ -100,7 +100,7 @@ templates:
         && python TestTimeAugmentation/run.py --images_path=/mnt/data/datasets/images/ --models=ssd_resnet --option={{workflow.parameters.ensemble-option}} --combine=False \
       workingDir: /mnt/src
     nodeSelector:
-      node.kubernetes.io/instance-type: '{{workflow.parameters.sys-node-pool}}'
+      beta.kubernetes.io/instance-type: '{{workflow.parameters.sys-node-pool}}'
   - name: tfod
     inputs:
       artifacts:
@@ -121,7 +121,7 @@ templates:
         s3:
           key: '{{workflow.namespace}}/{{workflow.parameters.model-output-path}}/{{workflow.name}}'
     container:
-      image: tensorflow/tensorflow:latest
+      image: cxyacr.azurecr.cn/docker.io/tensorflow/tensorflow:2.10.0
       command: [sh,-c]
       args:
        - |
@@ -134,7 +134,7 @@ templates:
       - name: output
         mountPath: /mnt/output
     nodeSelector:
-      node.kubernetes.io/instance-type: '{{workflow.parameters.sys-node-pool}}'
+      beta.kubernetes.io/instance-type: '{{workflow.parameters.sys-node-pool}}'
   - name: bash
     container:
       args:
@@ -142,9 +142,9 @@ templates:
       command:
       - bash
       - -c
-      image: bash
+      image: cxyacr.azurecr.cn/docker.io/bash:5.2.0
     nodeSelector:
-      node.kubernetes.io/instance-type: '{{workflow.parameters.sys-node-pool}}'
+      beta.kubernetes.io/instance-type: '{{workflow.parameters.sys-node-pool}}'
 volumeClaimTemplates:
   - metadata:
       name: output
