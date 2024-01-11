@@ -1,150 +1,160 @@
 arguments:
   parameters:
-  - name: cvat-annotation-path
-    value: artifacts/{{workflow.namespace}}/annotations/
-    displayName: Path to dataset
-  - name: ensemble-option
-    value: consensus
-  - name: model-output-path
-    value: model-comparison14
-  - displayName: CVAT dump format
-    name: dump-format
-    value: cvat_coco
-    visibility: private
-  - displayName: Node pool
-    hint: Name of node pool or group to run this workflow task
-    type: select.nodepool
-    name: sys-node-pool
-    value: default
-    required: true
+    - name: dataset
+      type: select.dataset
+      value: ""
+      displayName: Path to dataset
+    - name: ensemble-option
+      value: consensus
+    - name: model-output-path
+      value: model-comparison14
+    - displayName: CVAT dump format
+      name: dump-format
+      value: cvat_coco
+      visibility: private
+    - displayName: Node pool
+      hint: Name of node pool or group to run this workflow task
+      name: sys-node-pool
+      required: true
+      type: select.nodepool
+      value: default
+      visibility: public
+    - displayName: Node pool label
+      hint: Name of node pool or group to run this workflow task
+      name: sys-node-pool-label
+      type: select.nodepool-label
+      value: node.kubernetes.io/instance-type
+
 
 entrypoint: main
 templates:
   - name: main
     dag:
       tasks:
-      - name: process-input-data
-        template: bash
-      - name: predict-tfod-model
-        dependencies: [process-input-data]
-        template: tfod
-      - name: predict-ssdresnet-model
-        dependencies: [process-input-data]
-        template: ssdresnet
-      - name: ensemble
-        dependencies: [predict-tfod-model, predict-ssdresnet-model]
-        template: ensemble
+        - name: process-input-data
+          template: bash
+        - name: predict-tfod-model
+          dependencies: [process-input-data]
+          template: tfod
+        - name: predict-ssdresnet-model
+          dependencies: [process-input-data]
+          template: ssdresnet
+        - name: ensemble
+          dependencies: [predict-tfod-model, predict-ssdresnet-model]
+          template: ensemble
+
   - name: ensemble
     inputs:
       artifacts:
-      - name: src
-        path: /mnt/src
-        git:
-          repo:  "https://github.com/chuangxinyuan/ensembleObjectDetection.git"
-          revision: v1.0.0-aimp
-      - name: data
-        path: /mnt/data/datasets/
-        s3:
-          key: '{{workflow.namespace}}/{{workflow.parameters.model-output-path}}/{{workflow.name}}'
-      - name: origdata
-        path: /mnt/data/dataorig/
-        s3:
-          key: '{{workflow.parameters.cvat-annotation-path}}'  
+        - name: src
+          path: /mnt/src
+          git:
+            repo:  "https://gitee.com/chuangxinyuan/ensembleObjectDetection.git"
+        - name: tfod-data
+          path: /mnt/data/datasets/
+          s3:
+            key: '{{workflow.namespace}}/{{workflow.parameters.model-output-path}}/{{workflow.name}}'
+
+        - name: origdata
+          path: /mnt/data/dataorig/
+          s3:
+            key: '{{workflow.parameters.dataset}}'
     outputs:
       artifacts:
-      - name: model
-        path: /mnt/output
-        optional: true
-        s3:
-          key: '{{workflow.namespace}}/{{workflow.parameters.model-output-path}}/{{workflow.name}}'
+        - name: model
+          path: /mnt/output
+          optional: true
+    #          s3:
+    #            key: '{{workflow.namespace}}/{{workflow.parameters.model-output-path}}/{{workflow.name}}'
     container:
-      image: cxyacr.azurecr.cn/docker.io/tensorflow/tensorflow:2.10.0
+      image: tensorflow/tensorflow:2.10.0
       command: [sh, -c]
       args:
-       - |
-        ls /mnt/data/datasets/ \
-        && apt-get update \
-        && apt-get install libgl1-mesa-glx libsm6 libxext6 libglib2.0-0 libxext6 libxrender-dev wget unzip -y \
-        && bash setup.sh \
-        && python TestTimeAugmentation/run.py --images_path=/mnt/data/datasets --models=tfod,ssd_resnet --option={{workflow.parameters.ensemble-option}} --combine=True \
+        - |
+          ls /mnt/data/datasets/ \
+          && apt-get update \
+          && apt-get install libgl1-mesa-glx libsm6 libxext6 libglib2.0-0 libxext6 libxrender-dev wget unzip git -y \
+          && pip install scipy \
+          && bash setup.sh \
+          && python TestTimeAugmentation/run.py --images_path=/mnt/data/datasets --models=tfod,ssd_resnet --option={{workflow.parameters.ensemble-option}} --combine=True \
       workingDir: /mnt/src
     nodeSelector:
-      beta.kubernetes.io/instance-type: '{{workflow.parameters.sys-node-pool}}'    
+      '{{workflow.parameters.sys-node-pool-label}}': '{{workflow.parameters.sys-node-pool}}'
   - name: ssdresnet
     inputs:
       artifacts:
-      - name: src
-        path: /mnt/src
-        git:
-          repo: "https://github.com/chuangxinyuan/ensembleObjectDetection.git"
-          revision: v1.0.0-aimp
-      - name: data
-        path: /mnt/data/datasets/
-        s3:
-          key: '{{workflow.parameters.cvat-annotation-path}}'
+        - name: src
+          path: /mnt/src
+          git:
+            repo: "https://gitee.com/chuangxinyuan/ensembleObjectDetection.git"
+        - name: data
+          path: /mnt/data/datasets/
+          s3:
+            key: '{{workflow.parameters.dataset}}'
     outputs:
       artifacts:
-      - name: model
-        path: /mnt/output
-        optional: true
-        s3:
-          key: '{{workflow.namespace}}/{{workflow.parameters.model-output-path}}/{{workflow.name}}'
+        - name: model
+          path: /mnt/output
+          optional: true
+          s3:
+            key: '{{workflow.namespace}}/{{workflow.parameters.model-output-path}}/{{workflow.name}}'
     container:
-      image: cxyacr.azurecr.cn/docker.io/tensorflow/tensorflow:2.10.0
+      image: tensorflow/tensorflow:2.10.0
       command: [sh,-c]
       args:
-      - |
-        apt-get update \
-        && apt-get install libgl1-mesa-glx libsm6 libxext6 libglib2.0-0 libxext6 libxrender-dev wget unzip -y \
-        && bash setup.sh \
-        && python TestTimeAugmentation/run.py --images_path=/mnt/data/datasets/images/ --models=ssd_resnet --option={{workflow.parameters.ensemble-option}} --combine=False \
+        - |
+          apt-get update \
+          && apt-get install libgl1-mesa-glx libsm6 libxext6 libglib2.0-0 libxext6 libxrender-dev wget unzip git -y \
+          && pip install scipy \
+          && bash setup.sh \
+          && python TestTimeAugmentation/run.py --images_path=/mnt/data/datasets/images/ --models=ssd_resnet --option={{workflow.parameters.ensemble-option}} --combine=False \
       workingDir: /mnt/src
     nodeSelector:
-      beta.kubernetes.io/instance-type: '{{workflow.parameters.sys-node-pool}}'
+      '{{workflow.parameters.sys-node-pool-label}}': '{{workflow.parameters.sys-node-pool}}'
   - name: tfod
     inputs:
       artifacts:
-      - name: src
-        path: /mnt/src
-        git:
-          repo: "https://github.com/chuangxinyuan/ensembleObjectDetection.git"
-          revision: v1.0.0-aimp
-      - name: data
-        path: /mnt/data/datasets/
-        s3:
-          key: '{{workflow.parameters.cvat-annotation-path}}'
+        - name: src
+          path: /mnt/src
+          git:
+            repo: "https://gitee.com/chuangxinyuan/ensembleObjectDetection.git"
+        - name: data
+          path: /mnt/data/datasets/
+          s3:
+            key: '{{workflow.parameters.dataset}}'
     outputs:
       artifacts:
-      - name: model
-        path: /mnt/output
-        optional: true
-        s3:
-          key: '{{workflow.namespace}}/{{workflow.parameters.model-output-path}}/{{workflow.name}}'
+        - name: model
+          path: /mnt/output
+          optional: true
+          s3:
+            key: '{{workflow.namespace}}/{{workflow.parameters.model-output-path}}/{{workflow.name}}'
     container:
-      image: cxyacr.azurecr.cn/docker.io/tensorflow/tensorflow:2.10.0
+      image: tensorflow/tensorflow:2.10.0
       command: [sh,-c]
       args:
-       - |
-        apt-get update \
-        && apt-get install libgl1-mesa-glx libsm6 libxext6 libglib2.0-0 libxext6 libxrender-dev wget unzip -y \
-        && bash setup.sh \
-        && python TestTimeAugmentation/run.py --images_path=/mnt/data/datasets/images/ --models=tfod --option={{workflow.parameters.ensemble-option}} --combine=False \
+        - |
+          apt-get update \
+          && apt-get install libgl1-mesa-glx libsm6 libxext6 libglib2.0-0 libxext6 libxrender-dev wget unzip git -y \
+          && pip install scipy \
+          && bash setup.sh \
+          && python TestTimeAugmentation/run.py --images_path=/mnt/data/datasets/images/ --models=tfod --option={{workflow.parameters.ensemble-option}} --combine=False \
       workingDir: /mnt/src
       volumeMounts:
-      - name: output
-        mountPath: /mnt/output
+        - name: output
+          mountPath: /mnt/output
     nodeSelector:
-      beta.kubernetes.io/instance-type: '{{workflow.parameters.sys-node-pool}}'
+      '{{workflow.parameters.sys-node-pool-label}}': '{{workflow.parameters.sys-node-pool}}'
   - name: bash
     container:
       args:
-      - sleep 15
+        - sleep 15
       command:
-      - bash
-      - -c
-      image: cxyacr.azurecr.cn/docker.io/bash:5.2.0
+        - bash
+        - -c
+      image: bash
     nodeSelector:
-      beta.kubernetes.io/instance-type: '{{workflow.parameters.sys-node-pool}}'
+      '{{workflow.parameters.sys-node-pool-label}}': '{{workflow.parameters.sys-node-pool}}'
 volumeClaimTemplates:
   - metadata:
       name: output
